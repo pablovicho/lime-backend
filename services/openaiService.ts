@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import fs from "fs";
 
 const openai = new OpenAI({
@@ -20,10 +20,13 @@ export async function transcribeAudio(
   audioFilePath: string
 ): Promise<TranscriptionResult> {
   try {
-    const audioFile = fs.createReadStream(audioFilePath);
+    const fileBuffer = await fs.promises.readFile(audioFilePath);
+    const fileName = audioFilePath.split('/').pop() || 'audio.mp3';
+    
+    const file = await toFile(fileBuffer, fileName);
 
     const transcription = await openai.audio.transcriptions.create({
-      file: audioFile,
+      file: file,
       model: "whisper-1",
       response_format: "verbose_json",
     });
