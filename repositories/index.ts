@@ -1,2 +1,2 @@
-export * from "./PatientRepository.js";
-export * from "./NoteRepository.js";
+export * from "./PatientRepository";
+export * from "./NoteRepository";

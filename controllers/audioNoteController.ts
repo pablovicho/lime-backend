@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import { NoteRepository } from "../repositories/NoteRepository.js";
-import { PatientRepository } from "../repositories/PatientRepository.js";
-import { processAudioNote } from "../services/openaiService.js";
-import { AppError, asyncHandler } from "../middleware/errorHandler.js";
+import { NoteRepository } from "../repositories/NoteRepository";
+import { PatientRepository } from "../repositories/PatientRepository";
+import { processAudioNote } from "../services/openaiService";
+import { AppError, asyncHandler } from "../middleware/errorHandler";
 import fs from "fs/promises";
 import path from "path";
 
