@@ -1,5 +1,5 @@
-import { pool } from "../db/database.js";
-import { Note, CreateNoteInput, UpdateNoteInput, NoteWithPatient } from "../models/Note.js";
+import { pool } from "../db/database";
+import { Note, CreateNoteInput, UpdateNoteInput, NoteWithPatient } from "../models/Note";
 
 export class NoteRepository {
   async create(input: CreateNoteInput): Promise<Note> {

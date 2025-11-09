@@ -1,5 +1,5 @@
-import { pool } from "../db/database.js";
-import { Patient, CreatePatientInput } from "../models/Patient.js";
+import { pool } from "../db/database";
+import { Patient, CreatePatientInput } from "../models/Patient";
 
 export class PatientRepository {
   async create(input: CreatePatientInput): Promise<Patient> {

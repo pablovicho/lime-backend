@@ -5,18 +5,24 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node index.ts"
+    "dev": "ts-node index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "db:setup": "psql -U lime_user -d lime_scribe -h localhost -f db/schema.sql",
+    "db:create": "sudo -u postgres psql -c 'CREATE DATABASE lime_scribe;' && sudo -u postgres psql -c \"CREATE USER lime_user WITH PASSWORD 'changeme';\" && sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE lime_scribe TO lime_user;'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.17.1",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.0",
     "@types/pg": "^8.15.6",
