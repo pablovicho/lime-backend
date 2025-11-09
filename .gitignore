@@ -18,3 +18,7 @@ build/
 
 # pnpm files
 pnpm-lock.yaml
+
+# uploads
+static/uploads/*
+!static/uploads/.gitkeep

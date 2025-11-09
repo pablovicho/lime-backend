@@ -14,6 +14,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Audio uploads
+app.use("/uploads", express.static("static/uploads"));
+
 // Routes
 app.get("/", (req: Request, res: Response) => {
   res.json({
