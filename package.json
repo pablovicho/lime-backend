@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "db:setup": "psql -U lime_user -d lime_scribe -h localhost -f db/schema.sql",
+    "db:seed": "psql -U lime_user -d lime_scribe -h localhost -f db/seed.sql",
     "db:create": "sudo -u postgres psql -c 'CREATE DATABASE lime_scribe;' && sudo -u postgres psql -c \"CREATE USER lime_user WITH PASSWORD 'changeme';\" && sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE lime_scribe TO lime_user;'"
   },
   "keywords": [],
