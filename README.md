@@ -1,292 +1,110 @@
-# AI Scribe Notes Management API
+# AI Scribe Notes Management Tool
+
+A lightweight healthcare compliance tool that generates AI-powered clinical notes from audio or text input, built with Node.js, TypeScript, PostgreSQL, and React.
 
 ## Overview
 
-The Audio Notes API allows you to upload audio files that will be:
-1. **Transcribed** using OpenAI Whisper API
-2. **Processed** into structured clinical notes using GPT-4o-mini
-3. **Saved** to the database with both raw transcription and AI-generated summary
+This application allows healthcare providers to:
+- Create AI-generated clinical notes from audio recordings or typed text
+- Automatically transcribe audio using OpenAI Whisper
+- Generate structured SOAP-format
+- Associate notes with patient records
+- View and manage all clinical notes with patient details
 
-## Base URL
-```
-http://localhost:3000/api
+## Project Structure
+
+**Important:** This project requires both backend and frontend in **sibling directories**:
+
+## Quick Start
+
+### Option 1: Docker
+
+1. **Clone both repositories:**
+   ```bash
+   mkdir lime && cd lime
+   git clone <backend-repo-url> lime-backend
+   git clone <frontend-repo-url> lime-frontend
+   ```
+
+2. **Set up environment:**
+   ```bash
+   cd lime-backend
+   cp .env.example .env
+   # Edit .env and add your OPENAI_API_KEY
+   ```
+
+3. **Start everything:**
+   ```bash
+   docker compose up -d
+   ```
+
+4. **Access the application:**
+   -  **Frontend:** http://localhost:4173
+   -  **Backend API:** http://localhost:3000/api
+   -  **Database:** localhost:5432
+
+### Option 2: Local Development
+
+#### Backend Setup
+
+```bash
+cd lime-backend
+pnpm install
+
+# create .env file with your database credentials and OpenAI API key
+
+# Create database and user
+sudo -u postgres psql -c "CREATE DATABASE lime_scribe;"
+sudo -u postgres psql -c "CREATE USER lime_user WITH PASSWORD 'your_password';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE lime_scribe TO lime_user;"
+
+# Run schema and seed data
+PGPASSWORD=your_password psql -U lime_user -d lime_scribe -h localhost -f db/schema.sql
+PGPASSWORD=your_password psql -U lime_user -d lime_scribe -h localhost -f db/seed.sql
+
+# Start server
+pnpm run dev
 ```
 
-## Endpoints
+#### Frontend Setup
+
+```bash
+cd ../lime-frontend
+pnpm install
+pnpm run dev
+```
+
+## API Endpoints
 
 ### Patients
-
-#### Get All Patients
 ```
-GET /api/patients?limit=50&offset=0
+GET    /api/patients              List all patients
+GET    /api/patients/:id          Get patient by ID
+POST   /api/patients              Create patient
+PATCH  /api/patients/:id          Update patient
+DELETE /api/patients/:id          Delete patient
+GET    /api/patients/search?q=    Search patients by name
 ```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "results": 2,
-  "data": [
-    {
-      "id": "uuid",
-      "firstName": "John",
-      "lastName": "Doe",
-      "dateOfBirth": "1980-01-15T00:00:00.000Z",
-      "gender": "male",
-      "phoneNumber": "555-1234",
-      "email": "john.doe@example.com",
-      "address": {
-        "street": "123 Main St",
-        "city": "Springfield",
-        "state": "IL",
-        "zipCode": "62701"
-      },
-      "medicalRecordNumber": "MRN12345",
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
-    }
-  ]
-}
-```
-
-#### Get Patient by ID
-```
-GET /api/patients/:id
-```
-
-#### Create Patient
-```
-POST /api/patients
-Content-Type: application/json
-
-{
-  "firstName": "Jane",
-  "lastName": "Smith",
-  "dateOfBirth": "1990-05-20",
-  "gender": "female",
-  "phoneNumber": "555-5678",
-  "email": "jane.smith@example.com",
-  "address": {
-    "street": "456 Oak Ave",
-    "city": "Chicago",
-    "state": "IL",
-    "zipCode": "60601"
-  },
-  "medicalRecordNumber": "MRN67890"
-}
-```
-
-#### Update Patient
-```
-PATCH /api/patients/:id
-Content-Type: application/json
-
-{
-  "phoneNumber": "555-9999",
-  "email": "newemail@example.com"
-}
-```
-
-#### Delete Patient
-```
-DELETE /api/patients/:id
-```
-
-#### Search Patients
-```
-GET /api/patients/search?q=john&limit=50
-```
-
----
 
 ### Notes
-
-#### Get All Notes (with Patient Details)
 ```
-GET /api/notes?limit=50&offset=0
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "results": 1,
-  "data": [
-    {
-      "id": "uuid",
-      "patientId": "patient-uuid",
-      "title": "Initial Consultation",
-      "content": "Patient presents with...",
-      "inputType": "text",
-      "originalInput": "Raw input text",
-      "audioFileUrl": null,
-      "metadata": {
-        "duration": null,
-        "transcriptionModel": null,
-        "generationModel": "gpt-4",
-        "confidence": null
-      },
-      "status": "completed",
-      "createdBy": "Dr. Smith",
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z",
-      "patient": {
-        "id": "patient-uuid",
-        "firstName": "John",
-        "lastName": "Doe",
-        "dateOfBirth": "1980-01-15T00:00:00.000Z",
-        "medicalRecordNumber": "MRN12345"
-      }
-    }
-  ]
-}
+GET    /api/notes                  List all notes (with patient details)
+GET    /api/notes/:id              Get note by ID
+POST   /api/notes                  Create text note
+POST   /api/notes/audio            Upload audio → transcribe → generate note
+PATCH  /api/notes/:id              Update note
+DELETE /api/notes/:id              Delete note
+GET    /api/notes/patient/:id      Get notes by patient
+GET    /api/notes/search?q=        Search notes by title
 ```
 
-#### Get Note by ID
-```
-GET /api/notes/:id?includePatient=true
-```
+## TODOS
 
-Query Parameters:
-- `includePatient` (optional): Include patient details in response (default: false)
+Due to time constraints for this demo project:
 
-#### Create Note
-```
-POST /api/notes
-Content-Type: application/json
-
-{
-  "patientId": "patient-uuid",
-  "title": "Follow-up Visit",
-  "content": "Patient shows improvement...",
-  "inputType": "text",
-  "originalInput": "Doctor's raw notes",
-  "status": "draft",
-  "createdBy": "Dr. Johnson",
-  "metadata": {
-    "generationModel": "gpt-4"
-  }
-}
-```
-
-**For Audio Input:**
-```json
-{
-  "patientId": "patient-uuid",
-  "title": "Audio Consultation",
-  "content": "Transcribed and generated note content",
-  "inputType": "audio",
-  "originalInput": "Transcribed text from audio",
-  "audioFileUrl": "/uploads/audio/recording123.mp3",
-  "status": "completed",
-  "createdBy": "Dr. Smith",
-  "metadata": {
-    "duration": 300,
-    "transcriptionModel": "whisper-1",
-    "generationModel": "gpt-4",
-    "confidence": 0.95
-  }
-}
-```
-
-#### Update Note
-```
-PATCH /api/notes/:id
-Content-Type: application/json
-
-{
-  "title": "Updated Title",
-  "content": "Updated content",
-  "status": "reviewed"
-}
-```
-
-### Create Audio Note
-
-**POST** `/api/notes/audio`
-
-Upload an audio file, transcribe it, generate a clinical note, and save to database.
-
-#### Audio Request
-
-**Content-Type:** `multipart/form-data`
-
-**Form Fields:**
-- `audio` (file, required): Audio file (mp3, wav, m4a, webm, ogg)
-- `patientId` (string, required): UUID of the patient
-- `title` (string, required): Title for the note
-- `createdBy` (string, optional): Name of the person creating the note
-
-**File Constraints:**
-- Maximum file size: 25MB
-- Supported formats: mp3, wav, m4a, webm, ogg
-- Audio duration: Up to ~2 hours (depending on file size)
-
-#### Response
-
-**Status:** `201 Created`
-
-```json
-{
-  "status": "success",
-  "data": {
-    "note": {
-      "id": "uuid",
-      "patientId": "patient-uuid",
-      "title": "Initial Consultation Recording",
-      "content": "SOAP Note:\n\nSubjective:\nPatient reports...",
-      "inputType": "audio",
-      "originalInput": "Raw transcription text from audio...",
-      "audioFileUrl": "/uploads/audio-1234567890.mp3",
-      "metadata": {
-        "duration": 180,
-        "transcriptionModel": "whisper-1",
-        "generationModel": "gpt-4o-mini",
-        "confidence": null
-      },
-      "status": "completed",
-      "createdBy": "Dr. Smith",
-      "createdAt": "2025-01-09T00:00:00.000Z",
-      "updatedAt": "2025-01-09T00:00:00.000Z"
-    },
-    "processing": {
-      "transcription": "Raw transcription text from audio...",
-      "summary": "Patient presents with acute symptoms...",
-      "audioFile": "audio-1234567890.mp3"
-    }
-  }
-}
-
-## Data Flow
-
-```
-1. Audio File Upload
-   ↓
-2. File Validation (format, size)
-   ↓
-3. OpenAI Whisper Transcription
-   ↓
-4. GPT-4o-mini Clinical Note Generation
-   ↓
-5. Save to Database:
-   - content: AI-generated clinical note
-   - originalInput: Raw transcription
-   - audioFileUrl: File path
-   - metadata: Models used, duration, etc.
-   ↓
-6. Return Complete Note + Processing Details
-```
-
-## AI Processing Details
-
-### Transcription (Whisper)
-- Model: `whisper-1`
-- Converts speech to text
-- Preserves medical terminology
-- Handles various accents and audio qualities
-
-### Clinical Note Generation
-- Generates SOAP format notes when applicable
-- Creates structured clinical documentation
-- Provides a brief summary (2-3 sentences)
-- Optimized for medical/healthcare context
+1. Implement Authentication
+2. Implement Authorization
+3. Use S3/cloud storage instead of local storage
+4. Improve Error Handling
+5. Implement Throttling
+6. Implement Caching
